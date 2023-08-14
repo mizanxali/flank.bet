@@ -2,27 +2,18 @@
   "name": "grid-data-jam",
   "version": "1.0.0",
   "description": "## Overview",
-  "main": "server.js",
+  "main": "index.js",
   "engines": {
     "npm": ">=8.0.0",
     "node": ">=16.18.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js",
-    "watch": "nodemon server.js"
-  },
-  "type": "module",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/grid-esports/datajam-2023.git"
+    "build": "npx tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only index.ts"
   },
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/grid-esports/datajam-2023/issues"
-  },
-  "homepage": "https://github.com/grid-esports/datajam-2023#readme",
   "dependencies": {
     "glob": "^10.3.1",
     "jsonl-db": "^1.0.1",
@@ -30,6 +21,12 @@
     "ws": "^8.13.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "@types/node": "^20.5.0",
+    "@types/ws": "^8.5.5",
+    "concurrently": "^8.2.0",
+    "nodemon": "^3.0.1",
+    "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.1.6"
   }
 }

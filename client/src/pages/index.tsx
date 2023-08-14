@@ -1,3 +1,4 @@
+import { SeriesEventTypes, SocketResponse } from "@/types";
 import { useEffect } from "react";
 
 export default function Home() {
@@ -20,47 +21,36 @@ export default function Home() {
         return;
       }
 
-      const data = JSON.parse(event.data);
-      const type = data.events[0].type;
-      const actor = data.events[0].actor;
-      const target = data.events[0].target;
+      const data: SocketResponse = JSON.parse(event.data);
+      const type = data.type;
 
-      if (type === "series-started-game") {
+      if (type === SeriesEventTypes.seriesStartedGame) {
         console.log("--- MATCH BEGINS ---");
-        console.log("map: ", target.state.map.name);
-        console.log(
-          "team 1: ",
-          target.state.teams[0].name,
-          target.state.teams[0].side
-        );
-        console.log(
-          "team 2: ",
-          target.state.teams[1].name,
-          target.state.teams[0].side
-        );
-      } else if (type === "game-ended-round") {
-        console.log(" --- ", target.state.id, "ENDS ---");
-      } else if (type === "game-started-round") {
-        console.log("--- ", target.state.id, " BEGINS ---");
-      } else if (type === "round-started-freezetime") {
-      } else if (type === "round-ended-freezetime") {
-      } else if (type === "player-killed-player") {
+        console.log("map: ", data.map);
+        console.log("team 1: ", data.teams[0].name, data.teams[0].side);
+        console.log("team 2: ", data.teams[1].name, data.teams[1].side);
+      } else if (type === SeriesEventTypes.gameEndedRound) {
+        console.log(" --- ", data.round, "ENDS ---");
+      } else if (type === SeriesEventTypes.gameStartedRound) {
+        console.log("--- ", data.round, " BEGINS ---");
+      } else if (type === SeriesEventTypes.roundStartedFreezetime) {
+      } else if (type === SeriesEventTypes.roundEndedFreezetime) {
+      } else if (type === SeriesEventTypes.playerKilledPlayer) {
         console.log("--- KILL! ---");
-        console.log("killer: ", actor.state.name, actor.state.side);
-        console.log("killed: ", target.state.name, target.state.side);
-      } else if (type === "team-won-round") {
-        console.log("--- ", actor.state.name, " WIN ROUND ---");
-      } else if (type === "player-completed-plantBomb") {
+        console.log("killer: ", data.kill.name, data.kill.side);
+        console.log("killed: ", data.death.name, data.death.side);
+      } else if (type === SeriesEventTypes.teamWonRound) {
+        console.log("--- ", data.team.name, data.team.side, " WINS ROUND ---");
+      } else if (type === SeriesEventTypes.playerCompletedPlantBomb) {
         console.log("--- BOMB PLANTED! ---");
-        console.log("planter: ", actor.state.name);
-      } else if (type === "player-completed-defuseBomb") {
+        console.log("planter: ", data.player.name);
+      } else if (type === SeriesEventTypes.playerCompletedDefuseBomb) {
         console.log("--- BOMB DEFUSED! ---");
-        console.log("planter: ", actor.state.name);
-      } else if (type === "player-completed-explodeBomb") {
+        console.log("planter: ", data.player.name);
+      } else if (type === SeriesEventTypes.playerCompletedExplodeBomb) {
         console.log("--- BOMB EXPLODED! ---");
-        console.log("planter: ", actor.state.name);
-      } else if (type === "team-won-game") {
-        console.log("--- ", actor.state.name, " WINS GAME ---");
+      } else if (type === SeriesEventTypes.teamWonGame) {
+        console.log("--- ", data.team.name, " WINS GAME ---");
       } else {
         console.log({ type, data });
       }
