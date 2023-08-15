@@ -45,6 +45,7 @@ wss.on("connection", async function connection(ws, req) {
     // continue;
 
     const event = (line as any).events[0];
+    const sequenceNumber = (line as any).sequenceNumber;
     const type: string = event.type;
     const actor = event.actor;
     const target = event.target;
@@ -52,6 +53,7 @@ wss.on("connection", async function connection(ws, req) {
 
     switch (type) {
       case SeriesEventTypes.seriesStartedGame:
+        if (sequenceNumber === 3 || sequenceNumber === 4180) continue;
         await getOrSetData(id, matchID, {
           type: "map",
           active: true,
@@ -69,64 +71,66 @@ wss.on("connection", async function connection(ws, req) {
       case SeriesEventTypes.gameStartedRound:
         break;
       case SeriesEventTypes.gameEndedRound:
-        await finishBets("round", matchID);
+        // await finishBets("round", matchID);
         break;
       case SeriesEventTypes.roundStartedFreezetime:
-        await getOrSetData(id, matchID, {
-          type: "round",
-          active: true,
-          question: `Who will win the round?`,
-          options: [
-            {
-              answer: `${actor.state.teams[0].name} - ${actor.state.teams[0].side}`,
-            },
-            {
-              answer: `${actor.state.teams[1].name} - ${actor.state.teams[1].side}`,
-            },
-          ],
-        });
-        await getOrSetData(id, matchID, {
-          type: "round",
-          active: true,
-          question: `Will the bomb be planted in this round?`,
-          options: [
-            {
-              answer: `Yes`,
-            },
-            {
-              answer: `No`,
-            },
-          ],
-        });
+        // await getOrSetData(id, matchID, {
+        //   type: "round",
+        //   active: true,
+        //   question: `Who will win ${id}?`,
+        //   options: [
+        //     {
+        //       answer: `${actor.state.teams[0].name} - ${actor.state.teams[0].side}`,
+        //     },
+        //     {
+        //       answer: `${actor.state.teams[1].name} - ${actor.state.teams[1].side}`,
+        //     },
+        //   ],
+        // });
+        // await getOrSetData(id, matchID, {
+        //   type: "round",
+        //   active: true,
+        //   question: `Will the bomb be planted in this round?`,
+        //   options: [
+        //     {
+        //       answer: `Yes`,
+        //     },
+        //     {
+        //       answer: `No`,
+        //     },
+        //   ],
+        // });
         break;
       case SeriesEventTypes.roundEndedFreezetime:
         break;
       case SeriesEventTypes.teamWonRound:
-        await finishBets("round", matchID);
+        // await finishBets("round", matchID);
         break;
       case SeriesEventTypes.playerCompletedPlantBomb:
-        await getOrSetData(id, matchID, {
-          type: "bomb",
-          active: true,
-          question: `Will the bomb be defused in this round?`,
-          options: [
-            {
-              answer: `Yes`,
-            },
-            {
-              answer: `No`,
-            },
-          ],
-        });
+        // await getOrSetData(id, matchID, {
+        //   type: "bomb",
+        //   active: true,
+        //   question: `Will the bomb be defused in this round?`,
+        //   options: [
+        //     {
+        //       answer: `Yes`,
+        //     },
+        //     {
+        //       answer: `No`,
+        //     },
+        //   ],
+        // });
+        break;
       case SeriesEventTypes.playerCompletedDefuseBomb:
-        await finishBets("bomb", matchID);
+        // await finishBets("bomb", matchID);
         break;
       case SeriesEventTypes.playerCompletedExplodeBomb:
-        await finishBets("bomb", matchID);
+        // await finishBets("bomb", matchID);
         break;
       case SeriesEventTypes.playerKilledPlayer:
         break;
       case SeriesEventTypes.teamWonGame:
+        console.log(SeriesEventTypes.teamWonGame);
         await finishBets("map", matchID);
         break;
       default:
@@ -150,7 +154,7 @@ async function getOrSetData(id: string, matchID: string, obj: Object) {
 
 async function finishBets(type: string, matchID: string) {
   var betsRef = db.collection("matches").doc(matchID).collection("bets");
-  const query = betsRef.where("type", "==", type);
+  const query = betsRef.where("type", "==", type).where("active", "==", true);
 
   return new Promise((resolve, reject) => {
     updateQueryBatch(query, resolve).catch(reject);
@@ -171,6 +175,7 @@ async function updateQueryBatch(
 
   const batch = db.batch();
   snapshot.docs.forEach((doc: any) => {
+    console.log("Updating doc!");
     batch.update(doc.ref, { active: false });
   });
   await batch.commit();
