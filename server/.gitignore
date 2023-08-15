@@ -2,3 +2,4 @@ dist
 *.jsonl
 *.json
 node_modules
+*.log

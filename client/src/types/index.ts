@@ -1,12 +1,12 @@
-export interface ITeam {
-  name: string;
-  side: string;
-}
+// export interface ITeam {
+//   name: string;
+//   side: string;
+// }
 
-export interface IPlayer {
-  name: string;
-  side: string;
-}
+// export interface IPlayer {
+//   name: string;
+//   side: string;
+// }
 
 export enum SeriesEventTypes {
   gridStartedFeed = "grid-started-feed",
@@ -52,50 +52,58 @@ export enum SeriesEventTypes {
   playerRejoinedSeries = "player-rejoined-series",
 }
 
-export interface MapEvent {
-  type: SeriesEventTypes.seriesStartedGame;
-  map: string;
-  teams: ITeam[];
-}
+// export interface MapEvent {
+//   type: SeriesEventTypes.seriesStartedGame;
+//   map: string;
+//   teams: ITeam[];
+// }
 
-export interface TeamEvent {
-  type: SeriesEventTypes.teamWonRound | SeriesEventTypes.teamWonGame;
-  team: ITeam;
-}
+// export interface TeamEvent {
+//   type: SeriesEventTypes.teamWonRound | SeriesEventTypes.teamWonGame;
+//   team: ITeam;
+// }
 
-export interface PlayerEvent {
-  type:
-    | SeriesEventTypes.playerCompletedPlantBomb
-    | SeriesEventTypes.playerCompletedDefuseBomb;
-  player: IPlayer;
-}
+// export interface PlayerEvent {
+//   type:
+//     | SeriesEventTypes.playerCompletedPlantBomb
+//     | SeriesEventTypes.playerCompletedDefuseBomb;
+//   player: IPlayer;
+// }
 
-export interface KillEvent {
-  type: SeriesEventTypes.playerKilledPlayer;
-  kill: IPlayer;
-  death: IPlayer;
-}
+// export interface KillEvent {
+//   type: SeriesEventTypes.playerKilledPlayer;
+//   kill: IPlayer;
+//   death: IPlayer;
+// }
 
-export interface RoundEvent {
-  type: SeriesEventTypes.gameStartedRound | SeriesEventTypes.gameEndedRound;
-  round: string;
-}
+// export interface RoundEvent {
+//   type: SeriesEventTypes.gameStartedRound | SeriesEventTypes.gameEndedRound;
+//   round: string;
+// }
 
-export interface DefaultEvent {
-  type: Exclude<
-    SeriesEventTypes,
-    | MapEvent["type"]
-    | TeamEvent["type"]
-    | PlayerEvent["type"]
-    | KillEvent["type"]
-    | RoundEvent["type"]
-  >;
-}
+// export interface DefaultEvent {
+//   type: Exclude<
+//     SeriesEventTypes,
+//     | MapEvent["type"]
+//     | TeamEvent["type"]
+//     | PlayerEvent["type"]
+//     | KillEvent["type"]
+//     | RoundEvent["type"]
+//   >;
+// }
 
-export type SocketResponse =
-  | MapEvent
-  | TeamEvent
-  | PlayerEvent
-  | KillEvent
-  | RoundEvent
-  | DefaultEvent;
+// export type SocketResponse = (
+//   | MapEvent
+//   | TeamEvent
+//   | PlayerEvent
+//   | KillEvent
+//   | RoundEvent
+//   | DefaultEvent
+// ) & { id: string };
+
+export interface IBet {
+  type: "map" | "round" | "bomb";
+  active: boolean;
+  question: string;
+  options: string[];
+}

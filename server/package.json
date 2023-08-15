@@ -10,11 +10,12 @@
   "scripts": {
     "build": "npx tsc",
     "start": "node dist/index.js",
-    "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only index.ts"
+    "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/index.ts"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "firebase-admin": "^11.10.1",
     "glob": "^10.3.1",
     "jsonl-db": "^1.0.1",
     "node-jsonl": "^0.1.0",
