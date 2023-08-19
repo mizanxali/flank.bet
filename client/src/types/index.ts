@@ -106,5 +106,9 @@ export interface IBet {
   type: "map" | "round" | "bomb";
   active: boolean;
   question: string;
-  options: string[];
+  options: IOption[];
+}
+
+interface IOption {
+  answer: string;
 }
