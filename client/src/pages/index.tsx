@@ -27,15 +27,13 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const q = query(
-      collection(db, "matches/2578928/bets"),
-      where("active", "==", true)
-    );
+    const q = query(collection(db, "matches/2578928/bets"));
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const newBets: IBet[] = [];
       querySnapshot.forEach((doc) => {
         newBets.push(doc.data() as IBet);
+        newBets.sort((a, b) => b.timestamp - a.timestamp);
         setBets([...newBets]);
       });
     });
@@ -54,7 +52,9 @@ export default function Home() {
         allowFullScreen
       ></iframe> */}
       {bets.map((bet) => (
-        <h1>{bet.question}</h1>
+        <h1>
+          {bet.question} - {bet.active ? "active" : "done"}
+        </h1>
       ))}
     </div>
   );

@@ -102,6 +102,7 @@ export enum SeriesEventTypes {
 // ) & { id: string };
 
 export interface IBet {
+  timestamp: any;
   type: "map" | "round" | "bomb";
   active: boolean;
   question: string;

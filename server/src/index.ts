@@ -3,6 +3,7 @@ import { glob } from "glob";
 import * as jsonl from "node-jsonl";
 import { SeriesEventTypes } from "@types";
 import db from "./db";
+import { FieldValue } from "firebase-admin/firestore";
 
 const delayMs = 1000;
 
@@ -51,10 +52,16 @@ wss.on("connection", async function connection(ws, req) {
     const target = event.target;
     const id = event.id;
 
+    if (sequenceNumber === 3 || sequenceNumber === 5 || sequenceNumber === 4180)
+      continue;
+
     switch (type) {
       case SeriesEventTypes.seriesStartedGame:
-        if (sequenceNumber === 3 || sequenceNumber === 4180) continue;
-        await getOrSetData(id, matchID, {
+        await delay(3000);
+        await getOrSetData(matchID, {
+          timestamp: FieldValue.serverTimestamp(),
+          id,
+          sequenceNumber,
           type: "map",
           active: true,
           question: `Who will win the map - ${target.state.map.name}?`,
@@ -71,85 +78,101 @@ wss.on("connection", async function connection(ws, req) {
       case SeriesEventTypes.gameStartedRound:
         break;
       case SeriesEventTypes.gameEndedRound:
-        // await finishBets("round", matchID);
+        await delay(3000);
+        await finishBets("round", matchID);
+        await finishBets("bomb", matchID);
         break;
       case SeriesEventTypes.roundStartedFreezetime:
-        // await getOrSetData(id, matchID, {
-        //   type: "round",
-        //   active: true,
-        //   question: `Who will win ${id}?`,
-        //   options: [
-        //     {
-        //       answer: `${actor.state.teams[0].name} - ${actor.state.teams[0].side}`,
-        //     },
-        //     {
-        //       answer: `${actor.state.teams[1].name} - ${actor.state.teams[1].side}`,
-        //     },
-        //   ],
-        // });
-        // await getOrSetData(id, matchID, {
-        //   type: "round",
-        //   active: true,
-        //   question: `Will the bomb be planted in this round?`,
-        //   options: [
-        //     {
-        //       answer: `Yes`,
-        //     },
-        //     {
-        //       answer: `No`,
-        //     },
-        //   ],
-        // });
+        // await delay(3000);
+        console.log(actor.id, sequenceNumber);
+
+        await getOrSetData(matchID, {
+          timestamp: FieldValue.serverTimestamp(),
+          id,
+          sequenceNumber,
+          type: "round",
+          active: true,
+          question: `Who will win ${actor.id}?`,
+          options: [
+            {
+              answer: `${actor.state.teams[0].name} - ${actor.state.teams[0].side}`,
+            },
+            {
+              answer: `${actor.state.teams[1].name} - ${actor.state.teams[1].side}`,
+            },
+          ],
+        });
+        console.log("im here");
+
+        await getOrSetData(matchID, {
+          timestamp: FieldValue.serverTimestamp(),
+          id,
+          sequenceNumber,
+          type: "bomb",
+          active: true,
+          question: `Will the bomb be planted in this round?`,
+          options: [
+            {
+              answer: `Yes`,
+            },
+            {
+              answer: `No`,
+            },
+          ],
+        });
+        console.log("but not here?");
         break;
       case SeriesEventTypes.roundEndedFreezetime:
         break;
       case SeriesEventTypes.teamWonRound:
-        // await finishBets("round", matchID);
+        await delay(3000);
+        await finishBets("round", matchID);
         break;
       case SeriesEventTypes.playerCompletedPlantBomb:
-        // await getOrSetData(id, matchID, {
-        //   type: "bomb",
-        //   active: true,
-        //   question: `Will the bomb be defused in this round?`,
-        //   options: [
-        //     {
-        //       answer: `Yes`,
-        //     },
-        //     {
-        //       answer: `No`,
-        //     },
-        //   ],
-        // });
+        await delay(3000);
+        await finishBets("bomb", matchID);
+        await getOrSetData(matchID, {
+          timestamp: FieldValue.serverTimestamp(),
+          id,
+          sequenceNumber,
+          type: "bomb",
+          active: true,
+          question: `Will the bomb be defused in this round?`,
+          options: [
+            {
+              answer: `Yes`,
+            },
+            {
+              answer: `No`,
+            },
+          ],
+        });
         break;
       case SeriesEventTypes.playerCompletedDefuseBomb:
-        // await finishBets("bomb", matchID);
+        await delay(3000);
+        await finishBets("bomb", matchID);
         break;
       case SeriesEventTypes.playerCompletedExplodeBomb:
-        // await finishBets("bomb", matchID);
+        await delay(3000);
+        await finishBets("bomb", matchID);
         break;
       case SeriesEventTypes.playerKilledPlayer:
         break;
       case SeriesEventTypes.teamWonGame:
-        console.log(SeriesEventTypes.teamWonGame);
+        await delay(3000);
         await finishBets("map", matchID);
         break;
       default:
         continue;
     }
+
     // if (data) ws.send(JSON.stringify(data));
   }
 });
 
-async function getOrSetData(id: string, matchID: string, obj: Object) {
+async function getOrSetData(matchID: string, obj: Object) {
   var betsRef = db.collection("matches").doc(matchID).collection("bets");
-  const doc = await betsRef.doc(id).get();
-
-  if (!doc.exists) {
-    console.log("No such document!");
-    await betsRef.doc(id).set(obj);
-  } else {
-    console.log("Document already exists!");
-  }
+  await betsRef.add(obj);
 }
 
 async function finishBets(type: string, matchID: string) {
