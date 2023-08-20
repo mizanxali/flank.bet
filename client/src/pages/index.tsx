@@ -1,10 +1,14 @@
+import Layout from "@/components/Layout";
+import Navbar from "@/components/Navbar";
 import db from "@/db";
 import { IBet } from "@/types";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useAccount } from "wagmi";
 
 export default function Home() {
+  const { address, isDisconnected, isConnected } = useAccount();
+
   const [bets, setBets] = useState<IBet[]>([]);
 
   useEffect(() => {
@@ -37,40 +41,45 @@ export default function Home() {
   const lockBet = async () => {};
 
   return (
-    <div className="w-full h-screen">
-      {/* <iframe
+    <Layout>
+      <div className="">
+        {/* <iframe
         src="https://player.twitch.tv/?channel=wardell&parent=localhost"
         height="100%"
         width="100%"
         allowFullScreen
       ></iframe> */}
-      <ConnectButton />
-      {bets.map((bet) => (
-        <div className="flex flex-col items-center gap-2 border-2 border-white p-4 m-4">
-          <h6>{bet.active ? "ACTIVE" : "COMPLETED"}</h6>
-          <h1>{bet.question}</h1>
-          <div className="w-full flex-1 flex gap-4">
-            <div className="flex-1 flex flex-col items-center gap-2">
-              <h1>{bet.options[0].answer}</h1>
-              <button
-                className="rounded-lg border-white border-2 p-2"
-                onClick={() => lockBet()}
-              >
-                BET
-              </button>
-            </div>
-            <div className="flex-1 flex flex-col items-center gap-2">
-              <h1>{bet.options[1].answer}</h1>
-              <button
-                className="rounded-lg border-white border-2 p-2"
-                onClick={() => lockBet()}
-              >
-                BET
-              </button>
+        {bets.map((bet) => (
+          <div className="flex flex-col items-center gap-2 border-2 border-white p-4 m-4">
+            <h6>{bet.active ? "ACTIVE" : "COMPLETED"}</h6>
+            <h1>{bet.question}</h1>
+            <div className="w-full flex-1 flex gap-4">
+              <div className="flex-1 flex flex-col items-center gap-2">
+                <h1>{bet.options[0].answer}</h1>
+                {isConnected && (
+                  <button
+                    className="rounded-lg border-white border-2 p-2"
+                    onClick={() => lockBet()}
+                  >
+                    BET
+                  </button>
+                )}
+              </div>
+              <div className="flex-1 flex flex-col items-center gap-2">
+                <h1>{bet.options[1].answer}</h1>
+                {isConnected && (
+                  <button
+                    className="rounded-lg border-white border-2 p-2"
+                    onClick={() => lockBet()}
+                  >
+                    BET
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+    </Layout>
   );
 }
