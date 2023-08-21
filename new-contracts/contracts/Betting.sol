@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.11;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "hardhat/console.sol";
+import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
+import "../node_modules/hardhat/console.sol";
 import "./ATM.sol";
+import "../node_modules/@openzeppelin/contracts/utils/Strings.sol";
 
-contract bet is ATM, Ownable {
+contract Betting is ATM, Ownable {
     // event NewBet(address addy, uint amount, Team teamBet);
 
     struct Bet {
@@ -31,52 +32,51 @@ contract bet is ATM, Ownable {
     Bet[] public bets;
     Question[] public questions;
 
-    // struct Bet {
-    //     string name;
-    //     address addy;
-    //     uint amount;
-    //     Team teamBet;
-    // }
-
-    // struct Team {
-    //     string name;
-    //     uint totalBetAmount;
-    // }
-
-    // Bet[] public bets;
-    // Team[] public teams;
-
     address payable contractOwner;
 
-    // uint public totalBetMoney = 0;
-
-    // mapping(address => uint) public numBetsAddress;
+    mapping(address => Bet[]) public bettorsBets;
 
     constructor() payable {
         contractOwner = payable(msg.sender);
-        // teams.push(Team("team1", 0));
-        // teams.push(Team("team2", 0));
     }
 
-    // function createTeam(string memory _name) public {
-    //     teams.push(Team(_name, 0));
-    // }
+    function getQuestionsLength() public view returns (uint) {
+        return questions.length;
+    }
 
-    // function getTotalBetAmount(uint _teamId) public view returns (uint) {
-    //     return teams[_teamId].totalBetAmount;
-    // }
+    function getBetsLength() public view returns (uint) {
+        return bets.length;
+    }
+
+    function getAllQuestions()
+        public
+        view
+        onlyOwner
+        returns (Question[] memory)
+    {
+        return questions;
+    }
+
+    function getAllBets() public view onlyOwner returns (Bet[] memory) {
+        return bets;
+    }
+
+    function getQuestion(
+        uint256 _questionIndex
+    ) public view returns (Question memory) {
+        return questions[_questionIndex];
+    }
+
+    function getMyBets() public view returns (Bet[] memory) {
+        return bettorsBets[msg.sender];
+    }
 
     function createQuestion(
         string memory _id,
         string memory _title,
         string memory _primaryOption,
         string memory _secondaryOption
-    ) external returns (uint) {
-        require(
-            msg.sender == contractOwner,
-            "Only the contract owner can create a question"
-        );
-
+    ) external onlyOwner {
         questions.push(
             Question(
                 _id,
@@ -86,15 +86,13 @@ contract bet is ATM, Ownable {
                 0
             )
         );
-
-        return questions.length;
     }
 
     function createBet(
         uint _questionIndex,
         bool _primaryOptionSelected
     ) external payable {
-        require(msg.sender != contractOwner, "Contract owner can't make a bet");
+        // require(msg.sender != contractOwner, "Contract owner can't make a bet");
         require(msg.value > 0.01 ether, "Bet amount too small");
 
         deposit();
@@ -110,7 +108,9 @@ contract bet is ATM, Ownable {
 
         question.totalBetMoney += msg.value;
         selectedOption.totalBetAmount += msg.value;
-        bets.push(Bet(msg.sender, msg.value, question, selectedOption));
+        Bet memory bet = Bet(msg.sender, msg.value, question, selectedOption);
+        bets.push(bet);
+        bettorsBets[msg.sender].push(bet);
     }
 
     // function createBet(string memory _name, uint _teamId) external payable {
