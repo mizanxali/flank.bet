@@ -1,5 +1,5 @@
 {
-  "name": "smart-contracts",
+  "name": "new-contracts",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -16,16 +16,14 @@
     "@nomicfoundation/hardhat-verify": "^1.0.0",
     "@typechain/ethers-v6": "^0.4.0",
     "@typechain/hardhat": "^8.0.0",
-    "@types/chai": "^4.2.0",
-    "@types/mocha": ">=9.1.0",
-    "@types/node": ">=16.0.0",
     "chai": "^4.2.0",
     "ethers": "^6.4.0",
     "hardhat": "^2.17.1",
     "hardhat-gas-reporter": "^1.0.8",
     "solidity-coverage": "^0.8.0",
-    "ts-node": ">=8.0.0",
-    "typechain": "^8.1.0",
-    "typescript": ">=4.5.0"
+    "typechain": "^8.1.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.9.3"
   }
 }
