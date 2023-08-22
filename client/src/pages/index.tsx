@@ -1,5 +1,6 @@
 import Layout from "@/components/Layout";
 import Navbar from "@/components/Navbar";
+import BetCard from "@/components/BetCard";
 import db from "@/db";
 import { IBet } from "@/types";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
@@ -49,36 +50,11 @@ export default function Home() {
         width="100%"
         allowFullScreen
       ></iframe> */}
-        {bets.map((bet) => (
-          <div className="flex flex-col items-center gap-2 border-2 border-white p-4 m-4">
-            <h6>{bet.active ? "ACTIVE" : "COMPLETED"}</h6>
-            <h1>{bet.question}</h1>
-            <div className="w-full flex-1 flex gap-4">
-              <div className="flex-1 flex flex-col items-center gap-2">
-                <h1>{bet.options[0].answer}</h1>
-                {isConnected && (
-                  <button
-                    className="rounded-lg border-white border-2 p-2"
-                    onClick={() => lockBet()}
-                  >
-                    BET
-                  </button>
-                )}
-              </div>
-              <div className="flex-1 flex flex-col items-center gap-2">
-                <h1>{bet.options[1].answer}</h1>
-                {isConnected && (
-                  <button
-                    className="rounded-lg border-white border-2 p-2"
-                    onClick={() => lockBet()}
-                  >
-                    BET
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        ))}
+        <div className="flex flex-col gap-3">
+          {bets.map((bet) => (
+            <BetCard bet={bet} />
+          ))}
+        </div>
       </div>
     </Layout>
   );
