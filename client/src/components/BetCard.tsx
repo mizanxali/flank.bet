@@ -1,5 +1,8 @@
+import db from "@/db";
 import { IQuestion } from "@/types";
+import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { useMemo, useState } from "react";
+import { parseEther } from "viem";
 import { useAccount } from "wagmi";
 
 enum Options {
@@ -67,18 +70,23 @@ function BetCard({
   );
 
   const lockBetHandler = async () => {
-    depositToContract?.();
+    // @ts-ignore
+    // depositToContract?.({
+    //   args: [parseEther(selectedAmount.toString())],
+    //   value: parseEther(selectedAmount.toString()),
+    // });
 
     // console.log({ data });
 
-    // const questionRef = doc(db, `matches/2578928/questions/${id}`);
-    // await updateDoc(questionRef, {
-    //   bets: arrayUnion({
-    //     address: address,
-    //     option: selectedOption,
-    //     amount: selectedAmount,
-    //   }),
-    // });
+    const questionRef = doc(db, `matches/2578928/questions/${id}`);
+    await updateDoc(questionRef, {
+      bets: arrayUnion({
+        address: address,
+        option: selectedOption,
+        amount: selectedAmount,
+        winnings: 0,
+      }),
+    });
   };
 
   return (
@@ -113,8 +121,8 @@ function BetCard({
                 primaryClassname="text-light-2"
                 secondaryClassname="text-alternate-1"
                 label="Total Bet"
-                primaryValue={primaryBetAmount.toString() + " ETH"}
-                secondaryValue={secondaryBetAmount.toString() + " ETH"}
+                primaryValue={primaryBetAmount.toString() + " MATIC"}
+                secondaryValue={secondaryBetAmount.toString() + " MATIC"}
               />
               <StatRow
                 primaryClassname="text-light-2"
@@ -129,12 +137,12 @@ function BetCard({
                 label="Highest Bet"
                 primaryValue={
                   primaryBetCount > 0
-                    ? highestPrimaryBetAmount.toString() + " ETH"
+                    ? highestPrimaryBetAmount.toString() + " MATIC"
                     : "-"
                 }
                 secondaryValue={
                   secondaryBetCount > 0
-                    ? highestSecondaryBetAmount.toString() + " ETH"
+                    ? highestSecondaryBetAmount.toString() + " MATIC"
                     : "-"
                 }
               />
@@ -179,25 +187,25 @@ function BetCard({
                 <div className="flex-1 justify-between flex gap-3">
                   <OptionButton
                     isDisabled={!!myPlacedBet}
-                    text="0.025 ETH"
+                    text="0.025 MATIC"
                     isSelected={selectedAmount === 0.025}
                     onClick={() => setSelectedAmount(0.025)}
                   />
                   <OptionButton
                     isDisabled={!!myPlacedBet}
-                    text="0.05 ETH"
+                    text="0.05 MATIC"
                     isSelected={selectedAmount === 0.05}
                     onClick={() => setSelectedAmount(0.05)}
                   />
                   <OptionButton
                     isDisabled={!!myPlacedBet}
-                    text="0.075 ETH"
+                    text="0.075 MATIC"
                     isSelected={selectedAmount === 0.075}
                     onClick={() => setSelectedAmount(0.075)}
                   />
                   <OptionButton
                     isDisabled={!!myPlacedBet}
-                    text="0.1 ETH"
+                    text="0.1 MATIC"
                     isSelected={selectedAmount === 0.1}
                     onClick={() => setSelectedAmount(0.1)}
                   />
@@ -207,7 +215,27 @@ function BetCard({
                 </div>
               </div>
 
-              {!myPlacedBet && (
+              {myPlacedBet ? (
+                <>
+                  {!active && (
+                    <>
+                      {myPlacedBet.winnings > 0 ? (
+                        <div>
+                          Congratulations! You predicted correctly and won{` `}
+                          <span className="text-light-1">
+                            {myPlacedBet.winnings} MATIC.
+                          </span>
+                        </div>
+                      ) : (
+                        <div>
+                          Oops! Your prediction was incorrect. Better luck next
+                          time.
+                        </div>
+                      )}
+                    </>
+                  )}
+                </>
+              ) : (
                 <div>
                   <button
                     disabled={!canLockBet}

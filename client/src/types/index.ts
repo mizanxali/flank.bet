@@ -115,4 +115,5 @@ interface IBet {
   address: string;
   option: number;
   amount: number;
+  winnings: number;
 }
