@@ -21,7 +21,7 @@ describe("Betting smart contract", function () {
     });
   });
 
-  describe("Betting ransaction Tests", function () {
+  describe("Betting transaction Tests", function () {
     it("Should create a new question and return the total number of questions", async function () {
       await betting.createQuestion(
         "1234567",

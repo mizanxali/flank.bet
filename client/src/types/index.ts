@@ -101,14 +101,17 @@ export enum SeriesEventTypes {
 //   | DefaultEvent
 // ) & { id: string };
 
-export interface IBet {
+export interface IQuestion {
   timestamp: any;
   type: "map" | "round" | "bomb";
   active: boolean;
   question: string;
-  options: IOption[];
+  options: string[];
+  bets: IBet[];
 }
 
-interface IOption {
-  answer: string;
+interface IBet {
+  address: string;
+  option: string;
+  amount: number;
 }

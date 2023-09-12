@@ -57,7 +57,7 @@ wss.on("connection", async function connection(ws, req) {
 
     switch (type) {
       case SeriesEventTypes.seriesStartedGame:
-        await delay(3000);
+        // await delay(3000);
         await getOrSetData(matchID, {
           timestamp: FieldValue.serverTimestamp(),
           id,
@@ -66,25 +66,21 @@ wss.on("connection", async function connection(ws, req) {
           active: true,
           question: `Who will win the map - ${target.state.map.name}?`,
           options: [
-            {
-              answer: `${target.state.teams[0].name} - ${target.state.teams[0].side}`,
-            },
-            {
-              answer: `${target.state.teams[1].name} - ${target.state.teams[1].side}`,
-            },
+            `${target.state.teams[0].name} - ${target.state.teams[0].side}`,
+            `${target.state.teams[1].name} - ${target.state.teams[1].side}`,
           ],
+          bets: [],
         });
         break;
       case SeriesEventTypes.gameStartedRound:
         break;
       case SeriesEventTypes.gameEndedRound:
-        await delay(3000);
+        // await delay(3000);
         await finishBets("round", matchID);
         await finishBets("bomb", matchID);
         break;
       case SeriesEventTypes.roundStartedFreezetime:
-        // await delay(3000);
-        console.log(actor.id, sequenceNumber);
+        await delay(3000);
 
         await getOrSetData(matchID, {
           timestamp: FieldValue.serverTimestamp(),
@@ -94,15 +90,11 @@ wss.on("connection", async function connection(ws, req) {
           active: true,
           question: `Who will win ${actor.id}?`,
           options: [
-            {
-              answer: `${actor.state.teams[0].name} - ${actor.state.teams[0].side}`,
-            },
-            {
-              answer: `${actor.state.teams[1].name} - ${actor.state.teams[1].side}`,
-            },
+            `${actor.state.teams[0].name} - ${actor.state.teams[0].side}`,
+            `${actor.state.teams[1].name} - ${actor.state.teams[1].side}`,
           ],
+          bets: [],
         });
-        console.log("im here");
 
         await getOrSetData(matchID, {
           timestamp: FieldValue.serverTimestamp(),
@@ -111,25 +103,18 @@ wss.on("connection", async function connection(ws, req) {
           type: "bomb",
           active: true,
           question: `Will the bomb be planted in this round?`,
-          options: [
-            {
-              answer: `Yes`,
-            },
-            {
-              answer: `No`,
-            },
-          ],
+          options: [`Yes`, `No`],
+          bets: [],
         });
-        console.log("but not here?");
         break;
       case SeriesEventTypes.roundEndedFreezetime:
         break;
       case SeriesEventTypes.teamWonRound:
-        await delay(3000);
+        // await delay(3000);
         await finishBets("round", matchID);
         break;
       case SeriesEventTypes.playerCompletedPlantBomb:
-        await delay(3000);
+        // await delay(3000);
         await finishBets("bomb", matchID);
         await getOrSetData(matchID, {
           timestamp: FieldValue.serverTimestamp(),
@@ -138,28 +123,22 @@ wss.on("connection", async function connection(ws, req) {
           type: "bomb",
           active: true,
           question: `Will the bomb be defused in this round?`,
-          options: [
-            {
-              answer: `Yes`,
-            },
-            {
-              answer: `No`,
-            },
-          ],
+          options: [`Yes`, `No`],
+          bets: [],
         });
         break;
       case SeriesEventTypes.playerCompletedDefuseBomb:
-        await delay(3000);
+        // await delay(3000);
         await finishBets("bomb", matchID);
         break;
       case SeriesEventTypes.playerCompletedExplodeBomb:
-        await delay(3000);
+        // await delay(3000);
         await finishBets("bomb", matchID);
         break;
       case SeriesEventTypes.playerKilledPlayer:
         break;
       case SeriesEventTypes.teamWonGame:
-        await delay(3000);
+        // await delay(3000);
         await finishBets("map", matchID);
         break;
       default:
@@ -171,13 +150,21 @@ wss.on("connection", async function connection(ws, req) {
 });
 
 async function getOrSetData(matchID: string, obj: Object) {
-  var betsRef = db.collection("matches").doc(matchID).collection("bets");
-  await betsRef.add(obj);
+  var questionsRef = db
+    .collection("matches")
+    .doc(matchID)
+    .collection("questions");
+  await questionsRef.add(obj);
 }
 
 async function finishBets(type: string, matchID: string) {
-  var betsRef = db.collection("matches").doc(matchID).collection("bets");
-  const query = betsRef.where("type", "==", type).where("active", "==", true);
+  var questionsRef = db
+    .collection("matches")
+    .doc(matchID)
+    .collection("questions");
+  const query = questionsRef
+    .where("type", "==", type)
+    .where("active", "==", true);
 
   return new Promise((resolve, reject) => {
     updateQueryBatch(query, resolve).catch(reject);

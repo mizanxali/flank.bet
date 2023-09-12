@@ -7,12 +7,11 @@ import "./ATM.sol";
 import "../node_modules/@openzeppelin/contracts/utils/Strings.sol";
 
 contract Betting is ATM, Ownable {
-    // event NewBet(address addy, uint amount, Team teamBet);
+    // event NewBet(address bettorAddress, uint amount, Team teamBet);
 
     struct Bet {
         address bettorAddress;
         uint amount;
-        Question question;
         Option selectedOption;
     }
 
@@ -22,6 +21,7 @@ contract Betting is ATM, Ownable {
         Option primaryOption;
         Option secondaryOption;
         uint totalBetMoney;
+        uint totalBetCount;
     }
 
     struct Option {
@@ -29,12 +29,10 @@ contract Betting is ATM, Ownable {
         uint totalBetAmount;
     }
 
-    Bet[] public bets;
     Question[] public questions;
+    mapping(uint256 => Bet[]) public bets;
 
     address payable contractOwner;
-
-    mapping(address => Bet[]) public bettorsBets;
 
     constructor() payable {
         contractOwner = payable(msg.sender);
@@ -42,10 +40,6 @@ contract Betting is ATM, Ownable {
 
     function getQuestionsLength() public view returns (uint) {
         return questions.length;
-    }
-
-    function getBetsLength() public view returns (uint) {
-        return bets.length;
     }
 
     function getAllQuestions()
@@ -57,8 +51,10 @@ contract Betting is ATM, Ownable {
         return questions;
     }
 
-    function getAllBets() public view onlyOwner returns (Bet[] memory) {
-        return bets;
+    function getAllBets(
+        uint256 _questionIndex
+    ) public view onlyOwner returns (Bet[] memory) {
+        return bets[_questionIndex];
     }
 
     function getQuestion(
@@ -67,25 +63,24 @@ contract Betting is ATM, Ownable {
         return questions[_questionIndex];
     }
 
-    function getMyBets() public view returns (Bet[] memory) {
-        return bettorsBets[msg.sender];
-    }
-
     function createQuestion(
         string memory _id,
         string memory _title,
         string memory _primaryOption,
         string memory _secondaryOption
-    ) external onlyOwner {
+    ) external onlyOwner returns (uint) {
         questions.push(
             Question(
                 _id,
                 _title,
                 Option(_primaryOption, 0),
                 Option(_secondaryOption, 0),
+                0,
                 0
             )
         );
+
+        return questions.length;
     }
 
     function createBet(
@@ -107,96 +102,53 @@ contract Betting is ATM, Ownable {
             : question.secondaryOption;
 
         question.totalBetMoney += msg.value;
+        question.totalBetCount++;
         selectedOption.totalBetAmount += msg.value;
-        Bet memory bet = Bet(msg.sender, msg.value, question, selectedOption);
-        bets.push(bet);
-        bettorsBets[msg.sender].push(bet);
+        Bet memory bet = Bet(msg.sender, msg.value, selectedOption);
+        bets[_questionIndex].push(bet);
+
+        //emit NewBet(msg.sender, msg.value, teams[_teamId]);
     }
 
-    // function createBet(string memory _name, uint _teamId) external payable {
-    //     require(msg.sender != contractOwner, "owner can't make a bet");
-    //     require(
-    //         numBetsAddress[msg.sender] == 0,
-    //         "you have already placed a bet"
-    //     );
-    //     require(msg.value > 0.01 ether, "bet more");
+    function distributeWinnings(
+        uint _questionIndex,
+        bool _primaryOptionWon
+    ) public payable onlyOwner {
+        deposit();
+        uint div;
 
-    //     deposit();
+        Bet[] memory theBets = bets[_questionIndex];
+        Question memory theQuestion = questions[_questionIndex];
 
-    //     bets.push(Bet(_name, msg.sender, msg.value, teams[_teamId]));
+        for (uint i = 0; i < theBets.length; i++) {
+            bytes32 selectedOptionTitle = keccak256(
+                abi.encodePacked((theBets[i].selectedOption.title))
+            );
+            bytes32 primaryOptionTitle = keccak256(
+                abi.encodePacked((theQuestion.primaryOption.title))
+            );
+            bytes32 secondaryOptionTitle = keccak256(
+                abi.encodePacked((theQuestion.secondaryOption.title))
+            );
 
-    //     if (_teamId == 0) {
-    //         teams[0].totalBetAmount += msg.value;
-    //     }
-    //     if (_teamId == 1) {
-    //         teams[1].totalBetAmount += msg.value;
-    //     }
+            if (
+                (_primaryOptionWon &&
+                    selectedOptionTitle == primaryOptionTitle) ||
+                (!_primaryOptionWon &&
+                    selectedOptionTitle == secondaryOptionTitle)
+            ) {
+                address payable receiver = payable(theBets[i].bettorAddress);
+                console.log(receiver);
+                div =
+                    (theBets[i].amount *
+                        (10000 +
+                            ((theQuestion.totalBetMoney * 10000) /
+                                theQuestion.totalBetMoney))) /
+                    10000;
 
-    //     numBetsAddress[msg.sender]++;
-
-    //     (bool sent, bytes memory data) = contractOwner.call{value: msg.value}("");
-    //     require(sent, "Failed to send Ether");
-
-    //     totalBetMoney += msg.value;
-
-    //     emit NewBet(msg.sender, msg.value, teams[_teamId]);
-    // }
-
-    // function teamWinDistribution(uint _teamId) public payable onlyOwner {
-    //     deposit();
-    //     uint div;
-
-    //     if (_teamId == 0) {
-    //         for (uint i = 0; i < bets.length; i++) {
-    //             if (
-    //                 keccak256(abi.encodePacked((bets[i].teamBet.name))) ==
-    //                 keccak256(abi.encodePacked("team1"))
-    //             ) {
-    //                 address payable receiver = payable(bets[i].addy);
-    //                 console.log(receiver);
-    //                 div =
-    //                     (bets[i].amount *
-    //                         (10000 +
-    //                             ((getTotalBetAmount(1) * 10000) /
-    //                                 getTotalBetAmount(0)))) /
-    //                     10000;
-
-    //                 (bool sent, bytes memory data) = receiver.call{value: div}(
-    //                     ""
-    //                 );
-    //                 require(sent, "Failed to send Ether");
-    //             }
-    //         }
-    //     } else {
-    //         for (uint i = 0; i < bets.length; i++) {
-    //             if (
-    //                 keccak256(abi.encodePacked((bets[i].teamBet.name))) ==
-    //                 keccak256(abi.encodePacked("team2"))
-    //             ) {
-    //                 address payable receiver = payable(bets[i].addy);
-    //                 div =
-    //                     (bets[i].amount *
-    //                         (10000 +
-    //                             ((getTotalBetAmount(0) * 10000) /
-    //                                 getTotalBetAmount(1)))) /
-    //                     10000;
-    //                 console.log(getTotalBetAmount(0));
-    //                 console.log(div);
-
-    //                 (bool sent, bytes memory data) = receiver.call{value: div}(
-    //                     ""
-    //                 );
-    //                 require(sent, "Failed to send Ether");
-    //             }
-    //         }
-    //     }
-
-    //     totalBetMoney = 0;
-    //     teams[0].totalBetAmount = 0;
-    //     teams[1].totalBetAmount = 0;
-
-    //     for (uint i = 0; i < bets.length; i++) {
-    //         numBetsAddress[bets[i].addy] = 0;
-    //     }
-    // }
+                (bool sent, ) = receiver.call{value: div}("");
+                require(sent, "Failed to send Ether");
+            }
+        }
+    }
 }

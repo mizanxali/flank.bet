@@ -22,6 +22,7 @@ const config: Config = {
         1: "#27243D",
         2: "#090A0B",
         3: "#202328",
+        4: "#1A1631",
       },
       alternate: {
         1: "#8DBAFD",
