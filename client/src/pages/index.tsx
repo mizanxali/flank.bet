@@ -2,13 +2,17 @@ import BetCard from "@/components/BetCard";
 import Layout from "@/components/Layout";
 import db from "@/db";
 import { IQuestion } from "@/types";
-import { ethers } from "ethers";
+import { parseEther } from "ethers";
 import { collection, onSnapshot, query } from "firebase/firestore";
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState } from "react";
-import { useAccount } from "wagmi";
+import {
+  useContractRead,
+  useContractWrite,
+  usePrepareContractWrite,
+} from "wagmi";
+import BankABI from "../../../smart-contracts/artifacts/contracts/Bank.sol/Bank.json";
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
-// import Betting from "../../../new-contracts/artifacts/contracts/Betting.sol/Betting.json";
 
 enum Tabs {
   Ongoing,
@@ -16,7 +20,21 @@ enum Tabs {
 }
 
 export default function Home() {
-  const { address, isDisconnected, isConnected } = useAccount();
+  const { data, isError, isLoading } = useContractRead({
+    address: "0x5C8c13D8EE18b1Cb71b919107CA9C0a517518174",
+    abi: BankABI.abi,
+    functionName: "getTotalBalance",
+  });
+
+  const { config } = usePrepareContractWrite({
+    address: "0x5C8c13D8EE18b1Cb71b919107CA9C0a517518174",
+    abi: BankABI.abi,
+    functionName: "deposit",
+    args: [parseEther("0.05")],
+    value: parseEther("0.05"),
+  });
+  const { write } = useContractWrite(config);
+
   const [questions, setQuestions] = useState<IQuestion[]>([]);
 
   const activeQuestions = useMemo(
@@ -30,9 +48,9 @@ export default function Home() {
 
   const [selectedTab, setSelectedTab] = useState(Tabs.Ongoing);
 
-  useEffect(() => {
-    startEvents();
-  }, []);
+  // useEffect(() => {
+  //   startEvents();
+  // }, []);
 
   useEffect(() => {
     const q = query(collection(db, "matches/2578928/questions"));
@@ -51,11 +69,11 @@ export default function Home() {
     };
   }, []);
 
-  const startEvents = async () => {
-    // const ws = new WebSocket("ws://localhost:8080/2579048");
-    // const ws = new WebSocket("ws://localhost:8080/2579089");
-    const ws = new WebSocket("ws://localhost:8080/2578928");
-  };
+  // const startEvents = async () => {
+  //   // const ws = new WebSocket("ws://localhost:8080/2579048");
+  //   // const ws = new WebSocket("ws://localhost:8080/2579089");
+  //   const ws = new WebSocket("ws://localhost:8080/2578928");
+  // };
 
   return (
     <Layout>
@@ -93,8 +111,12 @@ export default function Home() {
         </div>
         <div className="flex flex-col gap-3">
           {selectedTab === Tabs.Ongoing
-            ? activeQuestions.map((qn) => <BetCard key={qn.id} qn={qn} />)
-            : inactiveQuestions.map((qn) => <BetCard key={qn.id} qn={qn} />)}
+            ? activeQuestions.map((qn) => (
+                <BetCard key={qn.id} qn={qn} depositToContract={write} />
+              ))
+            : inactiveQuestions.map((qn) => (
+                <BetCard key={qn.id} qn={qn} depositToContract={write} />
+              ))}
         </div>
       </div>
     </Layout>

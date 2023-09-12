@@ -1,7 +1,5 @@
-import db from "@/db";
 import { IQuestion } from "@/types";
-import { arrayUnion, doc, setDoc, updateDoc } from "firebase/firestore";
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useAccount } from "wagmi";
 
 enum Options {
@@ -11,10 +9,12 @@ enum Options {
 
 interface IBetCardProps {
   qn: IQuestion;
+  depositToContract: (() => void) | undefined;
 }
 
 function BetCard({
   qn: { active, options, question, timestamp, type, id, bets },
+  depositToContract,
 }: IBetCardProps) {
   const { address, isDisconnected, isConnected } = useAccount();
 
@@ -67,15 +67,18 @@ function BetCard({
   );
 
   const lockBetHandler = async () => {
-    const questionRef = doc(db, `matches/2578928/questions/${id}`);
+    depositToContract?.();
 
-    await updateDoc(questionRef, {
-      bets: arrayUnion({
-        address: address,
-        option: selectedOption,
-        amount: selectedAmount,
-      }),
-    });
+    // console.log({ data });
+
+    // const questionRef = doc(db, `matches/2578928/questions/${id}`);
+    // await updateDoc(questionRef, {
+    //   bets: arrayUnion({
+    //     address: address,
+    //     option: selectedOption,
+    //     amount: selectedAmount,
+    //   }),
+    // });
   };
 
   return (
