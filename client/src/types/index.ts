@@ -108,10 +108,11 @@ export interface IQuestion {
   question: string;
   options: string[];
   bets: IBet[];
+  id: string;
 }
 
 interface IBet {
   address: string;
-  option: string;
+  option: number;
   amount: number;
 }

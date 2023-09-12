@@ -40,7 +40,7 @@ export default function Home() {
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const newQuestions: IQuestion[] = [];
       querySnapshot.forEach((doc) => {
-        newQuestions.push(doc.data() as IQuestion);
+        newQuestions.push({ ...doc.data(), id: doc.id } as IQuestion);
         newQuestions.sort((a, b) => b.timestamp - a.timestamp);
         setQuestions([...newQuestions]);
       });
@@ -93,8 +93,8 @@ export default function Home() {
         </div>
         <div className="flex flex-col gap-3">
           {selectedTab === Tabs.Ongoing
-            ? activeQuestions.map((bet) => <BetCard bet={bet} />)
-            : inactiveQuestions.map((bet) => <BetCard bet={bet} />)}
+            ? activeQuestions.map((qn) => <BetCard key={qn.id} qn={qn} />)
+            : inactiveQuestions.map((qn) => <BetCard key={qn.id} qn={qn} />)}
         </div>
       </div>
     </Layout>
