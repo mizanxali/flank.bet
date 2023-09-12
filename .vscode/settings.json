@@ -1,5 +1,5 @@
 {
-  "solidity.compileUsingRemoteVersion": "v0.8.11+commit.d7f03943",
+  "solidity.compileUsingRemoteVersion": "v0.4.17+commit.bdeb9e52",
   "solidity.packageDefaultDependenciesDirectory": "new-contracts/node_modules",
   "git.ignoreLimitWarning": true,
 }
