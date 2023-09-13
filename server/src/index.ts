@@ -60,7 +60,7 @@ wss.on("connection", async function connection(ws, req) {
 
     switch (type) {
       case SeriesEventTypes.seriesStartedGame:
-        await delay(30000);
+        // await delay(30000);
         await getOrSetData(matchID, {
           timestamp: FieldValue.serverTimestamp(),
           id,
@@ -78,12 +78,12 @@ wss.on("connection", async function connection(ws, req) {
       case SeriesEventTypes.gameStartedRound:
         break;
       case SeriesEventTypes.gameEndedRound:
-        await delay(30000);
+        // await delay(30000);
         await finishBets("round", matchID, true);
         await finishBets("bomb", matchID, true);
         break;
       case SeriesEventTypes.roundStartedFreezetime:
-        await delay(30000);
+        // await delay(30000);
 
         await getOrSetData(matchID, {
           timestamp: FieldValue.serverTimestamp(),
@@ -113,11 +113,11 @@ wss.on("connection", async function connection(ws, req) {
       case SeriesEventTypes.roundEndedFreezetime:
         break;
       case SeriesEventTypes.teamWonRound:
-        await delay(30000);
+        // await delay(30000);
         await finishBets("round", matchID, true);
         break;
       case SeriesEventTypes.playerCompletedPlantBomb:
-        await delay(30000);
+        // await delay(30000);
         await finishBets("bomb", matchID, true);
         await getOrSetData(matchID, {
           timestamp: FieldValue.serverTimestamp(),
@@ -131,17 +131,17 @@ wss.on("connection", async function connection(ws, req) {
         });
         break;
       case SeriesEventTypes.playerCompletedDefuseBomb:
-        await delay(30000);
+        // await delay(30000);
         await finishBets("bomb", matchID, true);
         break;
       case SeriesEventTypes.playerCompletedExplodeBomb:
-        await delay(30000);
+        // await delay(30000);
         await finishBets("bomb", matchID, false);
         break;
       case SeriesEventTypes.playerKilledPlayer:
         break;
       case SeriesEventTypes.teamWonGame:
-        await delay(30000);
+        // await delay(30000);
         await finishBets("map", matchID, true);
         break;
       default:

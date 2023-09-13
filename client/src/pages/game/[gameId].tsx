@@ -48,8 +48,9 @@ export default function Game() {
   );
 
   useEffect(() => {
-    if (searchParams.get("events")) startEvents();
-  }, [searchParams]);
+    if (!router.isReady) return;
+    if (searchParams.get("events")) startEvents(gameId);
+  }, [searchParams, router.isReady]);
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -79,10 +80,8 @@ export default function Game() {
     };
   }, [router.isReady]);
 
-  const startEvents = async () => {
-    // const ws = new WebSocket("ws://localhost:8080/2579048");
-    // const ws = new WebSocket("ws://localhost:8080/2579089");
-    const ws = new WebSocket("ws://localhost:8080/2578928");
+  const startEvents = async (gameId: string) => {
+    const ws = new WebSocket(`ws://localhost:8080/${gameId}`);
   };
 
   if (!gameId) return <div>Loading...</div>;
