@@ -1,3 +1,8 @@
+# flank.bet
+- Devpost Submission: https://devpost.com/software/flank-bet
+- Live URL: https://flank.bet/
+- Figma Designs: https://www.figma.com/file/5FlELyPMTuCYf8dtNsE47O/Hackathon---Flank?type=design&node-id=1%3A26&mode=design&t=q3nuYNvL37rO9o3A-1
+
 ## Inspiration
 There are many websites that allow you to place bets on different sporting events. Very few of them provide esports as one of their offerings. And almost every single one of them allows you to bet only on the result of esports matches. But between the map picks and the final kill, **a lot** of things happen. My goal was to build an app that allowed viewers to get more involved in the action by predicting the result of small micro-events during the esports match like round results, kill counts, player abilities, and much more. We see such micro-bets in traditional sports but almost never in esports, until now. For such an app, a reliable source of live events happening in the game was essential, and GRID served that exact purpose. Additionally, money is the central aspect of a betting platform, so I also wanted to eliminate friction by adopting a borderless payments infrastructure to power my app. Hence I chose to do it using cryptocurrency, similar to _Stake.com_.
 
