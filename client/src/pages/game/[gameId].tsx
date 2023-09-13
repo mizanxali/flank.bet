@@ -49,7 +49,7 @@ export default function Game() {
 
   useEffect(() => {
     if (!router.isReady) return;
-    if (searchParams.get("events")) startEvents(gameId);
+    if (searchParams.get("events")) startEvents(gameId as string);
   }, [searchParams, router.isReady]);
 
   useEffect(() => {
