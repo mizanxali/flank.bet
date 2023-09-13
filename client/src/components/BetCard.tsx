@@ -72,12 +72,10 @@ function BetCard({
 
   const lockBetHandler = async () => {
     // @ts-ignore
-    // depositToContract?.({
-    //   args: [parseEther(selectedAmount.toString())],
-    //   value: parseEther(selectedAmount.toString()),
-    // });
-
-    // console.log({ data });
+    depositToContract?.({
+      args: [parseEther(selectedAmount.toString())],
+      value: parseEther(selectedAmount.toString()),
+    });
 
     const questionRef = doc(db, `matches/2578928/questions/${id}`);
     await updateDoc(questionRef, {
