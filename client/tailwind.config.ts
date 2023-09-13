@@ -23,6 +23,7 @@ const config: Config = {
         2: "#090A0B",
         3: "#202328",
         4: "#1A1631",
+        5: "#202328",
       },
       alternate: {
         1: "#8DBAFD",
@@ -31,6 +32,9 @@ const config: Config = {
         1: "#C7CAD1",
         2: "#9EA3AE",
         3: "#E2E5E9",
+      },
+      blacks: {
+        1: "#000000",
       },
     },
     extend: {

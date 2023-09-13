@@ -88,8 +88,8 @@ export default function Game() {
   if (!gameId) return <div>Loading...</div>;
 
   return (
-    <Layout>
-      <div className="w-full px-10">
+    <Layout showSidebar>
+      <div className="px-10">
         <ReactPlayer
           muted
           width={"100%"}
@@ -106,7 +106,7 @@ export default function Game() {
             },
           }}
         />
-        <div className="mb-2 font-bold text-3xl">
+        <div className="my-3 font-bold text-3xl">
           {homeTeam} vs {awayTeam}
         </div>
         <div className="my-3 flex gap-4">

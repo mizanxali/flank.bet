@@ -4,6 +4,7 @@ import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { useMemo, useState } from "react";
 import { parseEther } from "viem";
 import { useAccount } from "wagmi";
+import { AiOutlinePlusCircle, AiOutlineMinusCircle } from "react-icons/ai";
 
 enum Options {
   primary,
@@ -89,21 +90,34 @@ function BetCard({
     });
   };
 
+  const showStatsTable = bets && bets.length > 0;
+  const showBettingButtons = (active && address) || (!active && !!myPlacedBet);
+
+  let helperText = "";
+  if (active) {
+    if (!address) helperText = "Connect wallet to bet on this event.";
+  } else {
+    if (!showStatsTable) helperText = "No bets were placed on this event.";
+    else {
+      if (!!!myPlacedBet) helperText = "You did not bet on this event.";
+    }
+  }
+
   return (
     <div className="w-full rounded-md flex flex-col gap-4 p-4 border-2 border-light-8 text-center text-whites-1">
-      <div className="w-full flex justify-between">
+      <div className="w-full flex justify-between items-center">
         <span>{question}</span>
         <span
           className="cursor-pointer"
           onClick={() => setIsCardExpanded(!isCardExpanded)}
         >
-          +
+          {isCardExpanded ? <AiOutlineMinusCircle /> : <AiOutlinePlusCircle />}
         </span>
       </div>
 
       {isCardExpanded && (
         <>
-          {bets && bets.length > 0 && (
+          {showStatsTable && (
             <div className="rounded-md border border-dark-3 flex flex-col">
               <div className="flex justify-around border-b border-dark-3 py-3 font-bold">
                 <span className="flex-1 text-whites-3">{options[0]}</span>
@@ -162,7 +176,7 @@ function BetCard({
             </div>
           )}
 
-          {address ? (
+          {showBettingButtons && (
             <>
               <div className="w-full flex gap-4 items-center">
                 <div>Choose an Option</div>
@@ -251,8 +265,10 @@ function BetCard({
                 </div>
               )}
             </>
-          ) : (
-            <div className="text-light-6">Connect wallet to place bet.</div>
+          )}
+
+          {helperText.length > 0 && (
+            <div className="text-light-6">{helperText}</div>
           )}
         </>
       )}
