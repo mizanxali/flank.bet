@@ -167,7 +167,7 @@ function BetCard({
                     primaryBetCount > 0 ? highestPrimaryBet.address : "-"
                   }
                   secondaryValue={
-                    secondaryBetCount > 0 ? highestPrimaryBet.address : "-"
+                    secondaryBetCount > 0 ? highestSecondaryBet.address : "-"
                   }
                 />
               )}
