@@ -16,10 +16,10 @@ const Layout: React.FC<Props> = ({ showSidebar, children }) => {
       {showSidebar ? (
         <>
           <Sidebar />
-          <div className="ml-60 mt-24">{children}</div>
+          <div className="ml-60 mt-20">{children}</div>
         </>
       ) : (
-        <div className="flex-1 flex flex-col mt-24">{children}</div>
+        <div className="flex-1 flex flex-col mt-20">{children}</div>
       )}
     </div>
   );

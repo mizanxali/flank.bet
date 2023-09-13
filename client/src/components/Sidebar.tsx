@@ -10,7 +10,7 @@ import Link from "next/link";
 
 function Sidebar() {
   return (
-    <div className="mt-24 fixed top-0 left-0 w-60 flex flex-col gap-4 px-4">
+    <div className="mt-20 fixed top-0 left-0 w-60 flex flex-col gap-4 px-4">
       <Link href="/">
         <div className="flex gap-2 w-full items-center px-3 py-2 rounded-md cursor-pointer hover:text-light-2">
           <span>
