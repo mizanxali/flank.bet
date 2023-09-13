@@ -4,8 +4,8 @@ import * as jsonl from "node-jsonl";
 import { SeriesEventTypes } from "@types";
 import db from "./db";
 import { FieldValue } from "firebase-admin/firestore";
-import web3 from "web3";
 import BankABI from "../../smart-contracts/artifacts/contracts/Bank.sol/Bank.json";
+import { ethers } from "ethers";
 require("dotenv").config();
 
 const delayMs = 1000;
@@ -258,36 +258,24 @@ async function distributeWinnings(
 }
 
 async function transferPrizeMoney(address: string, amount: string) {
-  // const web3js = new web3(
-  //   new web3.providers.HttpProvider(
-  //     `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`
-  //   )
-  // );
-  // var myAddress = "0x73AE27967C2C98Dc168EC8f2b4cB1f2412239DEd";
-  // var privateKey = process.env.PRIVATE_KEY;
-  // var contractABI = BankABI.abi;
-  // var contractAddress = process.env.CONTRACT_ADDRESS;
-  // var contract = new web3js.eth.Contract(contractABI, contractAddress);
+  const provider = new ethers.providers.AlchemyProvider(
+    "maticmum",
+    process.env.ALCHEMY_API_KEY
+  );
+  const signer = new ethers.Wallet(process.env.PRIVATE_KEY as string, provider);
 
-  // let transaction = {
-  //   from: myAddress,
-  //   to: process.env.CONTRACT_ADDRESS,
-  //   data: (contract.methods.sendToPlayer as any)(
-  //     "0x6DC0d2aFDD77d3fCe6ecef0d65e8D9266eeeC2b3",
-  //     web3.utils.toWei("0.03", "ether")
-  //   ).encodeABI(),
-  // };
+  const BankContract = new ethers.Contract(
+    process.env.CONTRACT_ADDRESS as string,
+    BankABI.abi,
+    signer
+  );
 
-  // let rawTransaction = await web3js.eth.accounts.signTransaction(
-  //   transaction,
-  //   privateKey as any
-  // );
-  // let tx = await web3js.eth.sendSignedTransaction(
-  //   rawTransaction.rawTransaction
-  // );
+  const contract = BankContract.connect(signer);
 
-  console.log({ address, amount });
+  const tx = await contract.sendToPlayer(
+    address,
+    ethers.utils.parseEther(amount)
+  );
 
-  // const x = await method.send({ from: myAddress });
-  // console.log({ x });
+  console.log(tx);
 }
