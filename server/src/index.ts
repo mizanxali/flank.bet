@@ -8,7 +8,7 @@ import BankABI from "../../smart-contracts/artifacts/contracts/Bank.sol/Bank.jso
 import { ethers } from "ethers";
 require("dotenv").config();
 
-const delayMs = 1000;
+const delayMs = 30000;
 
 const wss = new WebSocketServer({
   port: 8080,
@@ -60,7 +60,7 @@ wss.on("connection", async function connection(ws, req) {
 
     switch (type) {
       case SeriesEventTypes.seriesStartedGame:
-        await delay(10000);
+        await delay(30000);
         await getOrSetData(matchID, {
           timestamp: FieldValue.serverTimestamp(),
           id,
@@ -78,12 +78,12 @@ wss.on("connection", async function connection(ws, req) {
       case SeriesEventTypes.gameStartedRound:
         break;
       case SeriesEventTypes.gameEndedRound:
-        await delay(10000);
+        await delay(30000);
         await finishBets("round", matchID, true);
         await finishBets("bomb", matchID, true);
         break;
       case SeriesEventTypes.roundStartedFreezetime:
-        await delay(3000);
+        await delay(30000);
 
         await getOrSetData(matchID, {
           timestamp: FieldValue.serverTimestamp(),
@@ -113,11 +113,11 @@ wss.on("connection", async function connection(ws, req) {
       case SeriesEventTypes.roundEndedFreezetime:
         break;
       case SeriesEventTypes.teamWonRound:
-        await delay(10000);
+        await delay(30000);
         await finishBets("round", matchID, true);
         break;
       case SeriesEventTypes.playerCompletedPlantBomb:
-        await delay(10000);
+        await delay(30000);
         await finishBets("bomb", matchID, true);
         await getOrSetData(matchID, {
           timestamp: FieldValue.serverTimestamp(),
@@ -131,17 +131,17 @@ wss.on("connection", async function connection(ws, req) {
         });
         break;
       case SeriesEventTypes.playerCompletedDefuseBomb:
-        await delay(10000);
+        await delay(30000);
         await finishBets("bomb", matchID, true);
         break;
       case SeriesEventTypes.playerCompletedExplodeBomb:
-        await delay(10000);
+        await delay(30000);
         await finishBets("bomb", matchID, false);
         break;
       case SeriesEventTypes.playerKilledPlayer:
         break;
       case SeriesEventTypes.teamWonGame:
-        await delay(10000);
+        await delay(30000);
         await finishBets("map", matchID, true);
         break;
       default:
